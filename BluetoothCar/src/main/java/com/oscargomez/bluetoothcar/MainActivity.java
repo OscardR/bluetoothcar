@@ -1,6 +1,5 @@
 package com.oscargomez.bluetoothcar;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -15,10 +14,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -29,46 +29,38 @@ public class MainActivity extends ActionBarActivity {
     private boolean bluetoothActive;
 
     private TextView txtStatus;
-    private Button btnConnect;
+    private Button btnExplore;
     private ListView listDevices;
+    private DeviceListAdapter adapter;
 
     private String btAddress;
     private String btName;
 
-    BroadcastReceiver discoveryResult = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String remoteDeviceName =
-                    intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
-            BluetoothDevice remoteDevice =
-                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            int rssi =
-                    intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
-            String mac = remoteDevice.getAddress();
-
-            deviceList.add(remoteDevice);
-            listDevices.setEnabled(false);
-            listDevices.setEnabled(true);
-
-            Log.d("BluetoothCar", "Descubierto " + remoteDeviceName);
-            Log.d("BluetoothCar", "RSSI: "+ rssi + "dBm");
-            Log.d("BluetoothCar", "MAC: "+ mac);
-        }
-    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         txtStatus = (TextView) findViewById(R.id.txtStatus);
-        btnConnect = (Button) findViewById(R.id.btnConnect);
+        btnExplore = (Button) findViewById(R.id.btnExplore);
         listDevices = (ListView) findViewById(R.id.listDevices);
 
-        DeviceListAdapter adapter = new DeviceListAdapter(this,
+        adapter = new DeviceListAdapter(this,
                 deviceList) {
 
         };
         listDevices.setAdapter(adapter);
+        listDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Context context = getApplicationContext();
+                CharSequence text = "Has hecho click en " + position;
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+            }
+        });
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -82,12 +74,12 @@ public class MainActivity extends ActionBarActivity {
                 bluetoothActive = true;
                 setBluetoothData();
                 startDiscovery();
-                btnConnect.setText("Desconectar");
+                btnExplore.setText("Desconectar");
             } else {
                 Log.d("BluetoothCar", "Bluetooth desactivado... esperando acción del usuario");
             }
         } else {
-            btnConnect.setEnabled(false);
+            btnExplore.setEnabled(false);
         }
     }
 
@@ -111,24 +103,31 @@ public class MainActivity extends ActionBarActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_bluetooth:
-                btnConnectClick(btnConnect.getRootView());
+                btnConnectClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void btnConnectClick(View view) {
+    public void btnExploreClick(View view) {
+        startDiscovery();
+        btnExplore.setText("Buscando Dispositivos...");
+        btnExplore.setEnabled(false);
+    }
+
+    public void btnConnectClick() {
         if (bluetooth != null) {
             if (!bluetooth.isEnabled()) {
                 startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), 1);
-                txtStatus.setText("Conectando Bluetooth...");
+                txtStatus.setText("Activando Bluetooth...");
             } else {
                 txtStatus.setText("Desactivando Bluetooth...");
+                if (bluetooth.isDiscovering()) bluetooth.cancelDiscovery();
                 bluetooth.disable();
                 bluetoothActive = false;
                 txtStatus.setText("Bluetooth Desactivado");
-                btnConnect.setText("Conectar Bluetooth");
+                btnExplore.setEnabled(false);
             }
         }
     }
@@ -136,14 +135,14 @@ public class MainActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) //Bluetooth permission request window
             if (resultCode == RESULT_OK) {
-                txtStatus.setText("Bluetooth " + requestCode + " Activado");
+                txtStatus.setText("Bluetooth Activado");
                 setBluetoothData();
                 bluetoothActive = true;
-                btnConnect.setText("Desconectar Bluetooth");
+                btnExplore.setEnabled(true);
                 startDiscovery();
             } else {
-                txtStatus.setText("Bluetooth " + requestCode + " NO Activado");
-                btnConnect.setText("Conectar Bluetooth");
+                txtStatus.setText("Bluetooth NO Activado");
+                btnExplore.setEnabled(false);
             }
     }
 
@@ -152,12 +151,44 @@ public class MainActivity extends ActionBarActivity {
         if (bluetoothActive){
             deviceList.clear();
             registerReceiver(discoveryResult, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+            registerReceiver(discoveryFinish, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
             //Device's discovery
-            txtStatus.setText("Descubrimiento de dispositivos Bluetooth");
+            txtStatus.setText("Descubriendo dispositivos Bluetooth...");
             Log.d("BluetoothCar", "startDiscovery");
             bluetooth.startDiscovery();
+        } else {
+            txtStatus.setText("Activa primero el Bluetooth");
         }
     }
+
+    BroadcastReceiver discoveryResult = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String remoteDeviceName =
+                    intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
+            BluetoothDevice remoteDevice =
+                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            int rssi =
+                    intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
+            String mac = remoteDevice.getAddress();
+
+            deviceList.add(remoteDevice);
+            listDevices.setAdapter(adapter);
+
+            Log.d("BluetoothCar", "Descubierto " + remoteDeviceName);
+            Log.d("BluetoothCar", "RSSI: "+ rssi + "dBm");
+            Log.d("BluetoothCar", "MAC: "+ mac);
+        }
+    };
+
+    BroadcastReceiver discoveryFinish = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            btnExplore.setText("Buscar de nuevo");
+            btnExplore.setEnabled(true);
+            txtStatus.setText("Búsqueda Finalizada");
+        }
+    };
 
     @Override
     public void onDestroy() {

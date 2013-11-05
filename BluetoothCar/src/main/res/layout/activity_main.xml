@@ -9,19 +9,20 @@
     tools:context=".MainActivity">
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Activar Bluetooth"
-        android:id="@+id/btnConnect"
+        android:text="Buscar Dispositivos"
+        android:id="@+id/btnExplore"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:onClick="btnConnectClick" />
+        android:onClick="btnExploreClick"
+        android:enabled="false" />
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/listDevices"
-        android:layout_below="@+id/btnConnect"
+        android:layout_below="@+id/btnExplore"
         android:layout_centerHorizontal="true"
         android:clickable="true"
         android:layout_above="@+id/txtStatus" />

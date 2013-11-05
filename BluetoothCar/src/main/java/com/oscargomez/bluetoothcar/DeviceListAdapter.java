@@ -1,7 +1,9 @@
 package com.oscargomez.bluetoothcar;
 
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +41,7 @@ public class DeviceListAdapter extends BaseAdapter {
             return position;
         }
 
+        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
             if (convertView == null) {
@@ -53,7 +56,8 @@ public class DeviceListAdapter extends BaseAdapter {
             }
 
             holder.deviceName.setText(listData.get(position).getName());
-            holder.deviceInfo.setText(listData.get(position).getUuids().toString());
+            if(listData.get(position).getUuids() != null)
+                holder.deviceInfo.setText(listData.get(position).getUuids().length);
             holder.deviceMAC.setText(listData.get(position).getAddress());
 
             return convertView;

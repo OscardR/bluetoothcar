@@ -18,13 +18,17 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.oscargomez.bluetoothcar.MainActivity"
-            android:theme="@style/Theme.AppCompat.Light"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.oscargomez.bluetoothcar.ControllerActivity"
+            android:label="@string/title_activity_controller" >
         </activity>
     </application>
 

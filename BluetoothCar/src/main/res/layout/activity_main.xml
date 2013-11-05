@@ -17,6 +17,15 @@
         android:layout_centerHorizontal="true"
         android:onClick="btnConnectClick" />
 
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listDevices"
+        android:layout_below="@+id/btnConnect"
+        android:layout_centerHorizontal="true"
+        android:clickable="true"
+        android:layout_above="@+id/txtStatus" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

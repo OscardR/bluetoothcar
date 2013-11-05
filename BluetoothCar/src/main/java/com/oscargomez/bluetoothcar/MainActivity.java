@@ -15,7 +15,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class MainActivity extends ActionBarActivity {
 
     private TextView txtStatus;
     private Button btnConnect;
+    private ListView listDevices;
 
     private String btAddress;
     private String btName;
@@ -42,10 +45,14 @@ public class MainActivity extends ActionBarActivity {
             int rssi =
                     intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
             String mac = remoteDevice.getAddress();
+
             deviceList.add(remoteDevice);
-            Log.d("HelloWorld", "Descubierto " + remoteDeviceName);
-            Log.d("HelloWorld", "RSSI: "+ rssi + "dBm");
-            Log.d("HelloWorld", "MAC: "+ mac);
+            listDevices.setEnabled(false);
+            listDevices.setEnabled(true);
+
+            Log.d("BluetoothCar", "Descubierto " + remoteDeviceName);
+            Log.d("BluetoothCar", "RSSI: "+ rssi + "dBm");
+            Log.d("BluetoothCar", "MAC: "+ mac);
         }
     };
     @Override
@@ -55,9 +62,16 @@ public class MainActivity extends ActionBarActivity {
 
         txtStatus = (TextView) findViewById(R.id.txtStatus);
         btnConnect = (Button) findViewById(R.id.btnConnect);
+        listDevices = (ListView) findViewById(R.id.listDevices);
+
+        DeviceListAdapter adapter = new DeviceListAdapter(this,
+                deviceList) {
+
+        };
+        listDevices.setAdapter(adapter);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(false);
 
         bluetoothActive = false;
@@ -68,8 +82,9 @@ public class MainActivity extends ActionBarActivity {
                 bluetoothActive = true;
                 setBluetoothData();
                 startDiscovery();
+                btnConnect.setText("Desconectar");
             } else {
-                Log.d("HelloWorld", "Bluetooth desactivado... esperando acción del usuario");
+                Log.d("BluetoothCar", "Bluetooth desactivado... esperando acción del usuario");
             }
         } else {
             btnConnect.setEnabled(false);
@@ -79,8 +94,8 @@ public class MainActivity extends ActionBarActivity {
     private void setBluetoothData() {
         btAddress = bluetooth.getAddress();
         btName = bluetooth.getName();
-        Log.d("HelloWorld", "Dirección Bluetooth: " + btAddress);
-        Log.d("HelloWorld", "Nombre Bluetooth: " + btName);
+        Log.d("BluetoothCar", "Dirección Bluetooth: " + btAddress);
+        Log.d("BluetoothCar", "Nombre Bluetooth: " + btName);
     }
 
     @Override
@@ -139,7 +154,7 @@ public class MainActivity extends ActionBarActivity {
             registerReceiver(discoveryResult, new IntentFilter(BluetoothDevice.ACTION_FOUND));
             //Device's discovery
             txtStatus.setText("Descubrimiento de dispositivos Bluetooth");
-            Log.d("HelloWorld", "startDiscovery");
+            Log.d("BluetoothCar", "startDiscovery");
             bluetooth.startDiscovery();
         }
     }
@@ -147,7 +162,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("HelloWorld", "Saliendo...");
+        Log.d("BluetoothCar", "Saliendo...");
     }
 
     @Override

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
 
-    private BluetoothAdapter bluetooth;
+    protected static BluetoothAdapter bluetooth;
     private ArrayList<BluetoothDevice> deviceList = new ArrayList<BluetoothDevice>();
     private boolean bluetoothActive;
 
@@ -47,10 +47,7 @@ public class MainActivity extends ActionBarActivity {
         btnExplore = (Button) findViewById(R.id.btnExplore);
         listDevices = (ListView) findViewById(R.id.listDevices);
 
-        adapter = new DeviceListAdapter(this,
-                deviceList) {
-
-        };
+        adapter = new DeviceListAdapter(this, deviceList);
         listDevices.setAdapter(adapter);
         listDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -63,15 +60,16 @@ public class MainActivity extends ActionBarActivity {
                 toast.show();
 
                 Intent i = new Intent(getApplicationContext(), ControllerActivity.class);
-                //i.putExtra("bluetooth", bluetooth);
                 startActivity(i);
             }
         });
 
+        // Setear la action bar
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(false);
 
+        // Inicializar el Bluetooth
         bluetoothActive = false;
         bluetooth = BluetoothAdapter.getDefaultAdapter();
 
@@ -89,6 +87,9 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    /**
+     * Función helper para recoger datos relativos al dispositivo bluetooth encontrado
+     */
     private void setBluetoothData() {
         btAddress = bluetooth.getAddress();
         btName = bluetooth.getName();

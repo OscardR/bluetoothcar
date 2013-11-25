@@ -48,7 +48,7 @@ public class DeviceListAdapter extends BaseAdapter {
                 convertView = layoutInflater.inflate(R.layout.device_list_item, null);
                 holder = new ViewHolder();
                 holder.deviceName = (TextView) convertView.findViewById(R.id.txtName);
-                holder.deviceInfo = (TextView) convertView.findViewById(R.id.txtInfo);
+                //holder.deviceInfo = (TextView) convertView.findViewById(R.id.txtInfo);
                 holder.deviceMAC = (TextView) convertView.findViewById(R.id.txtMAC);
                 convertView.setTag(holder);
             } else {
@@ -56,8 +56,8 @@ public class DeviceListAdapter extends BaseAdapter {
             }
 
             holder.deviceName.setText(listData.get(position).getName());
-            if(listData.get(position).getUuids() != null)
-                holder.deviceInfo.setText(listData.get(position).getUuids().length);
+//            if(listData.get(position).getUuids() != null)
+//                holder.deviceInfo.setText(listData.get(position).getUuids().length);
             holder.deviceMAC.setText(listData.get(position).getAddress());
 
             return convertView;

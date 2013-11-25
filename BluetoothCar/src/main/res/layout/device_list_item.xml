@@ -11,19 +11,19 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/txtName" />
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/txtInfo"
-        android:layout_alignParentEnd="false"
-        android:layout_alignParentStart="false"
-        android:layout_below="@+id/txtName" />
+    <!--<TextView-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+        <!--android:id="@+id/txtInfo"-->
+        <!--android:layout_alignParentEnd="false"-->
+        <!--android:layout_alignParentStart="false"-->
+        <!--android:layout_below="@+id/txtName" />-->
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/txtMAC"
-        android:layout_below="@+id/txtInfo" />
+        android:layout_below="@+id/txtName" />
 </RelativeLayout>

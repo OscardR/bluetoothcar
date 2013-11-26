@@ -2,7 +2,6 @@ package com.oscargomez.bluetoothcar;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
@@ -38,7 +37,12 @@ public class ControllerActivity extends ActionBarActivity implements ControllerL
     private InputStream inputStream;
     private StringBuffer sbu;
     private Handler _handler = new Handler();
-    
+
+    private final byte[] FORWARD = {'1'};
+    private final byte[] BACKWARD = {'0'};
+    private final byte[] LEFT = {'2'};
+    private final byte[] RIGHT = {'3'};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,11 +62,8 @@ public class ControllerActivity extends ActionBarActivity implements ControllerL
         }
 
         Log.d("bluetoothcar", "Bluetooth desde MainActivity: " + MainActivity.bluetooth.getName());
-    }
 
-    @Override
-    protected void onActivityResult(int rq, int rs, Intent data) {
-        device = data.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         Log.d("bluetoothcar", "recibido parcelable BluetoothDevice!");
         connect(device);
     }
@@ -90,21 +91,45 @@ public class ControllerActivity extends ActionBarActivity implements ControllerL
     @Override
     public void onClickBtnFwd(View view) {
         Log.d("bluetoothcar", "Forward/from Activity");
+        // Mandar un 0 por el serial del bluetooth
+        try {
+            outputStream.write(FORWARD);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onClickBtnBack(View view) {
         Log.d("bluetoothcar", "Back/from Activity");
+        // Mandar un 1 por el serial del bluetooth
+        try {
+            outputStream.write(BACKWARD);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onClickBtnLeft(View view) {
         Log.d("bluetoothcar", "Left/from Activity");
+        // Mandar un 2 por el serial del bluetooth
+        try {
+            outputStream.write(LEFT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onClickBtnRight(View view) {
         Log.d("bluetoothcar", "Right/from Activity");
+        // Mandar un 3 por el serial del bluetooth
+        try {
+            outputStream.write(RIGHT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     protected void connect(BluetoothDevice device) {
@@ -119,53 +144,8 @@ public class ControllerActivity extends ActionBarActivity implements ControllerL
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
 
-            int read = -1;
-            final byte[] bytes = new byte[2048];
-
-            while ((read = inputStream.read(bytes)) > -1) {
-                final int count = read;
-                _handler.post(new Runnable() {
-                    public void run() {
-                        StringBuilder b = new StringBuilder();
-                        for (int i = 0; i < count; ++i) {
-                            String s = Integer.toString(bytes[i]);
-                            b.append(s);
-                            b.append(",");
-                        }
-                        String s = b.toString();
-                        String[] chars = s.split(",");
-                        sbu = new StringBuffer();
-                        for (int i = 0; i < chars.length; i++) {
-                            sbu.append((char) Integer.parseInt(chars[i]));
-                        }
-                        Log.d("bluetoothcar", "inputStream");
-                        if (str != null) {
-                            Log.d("bluetoothcar", str + "<-- " + sbu);
-                            str += ("<-- " + sbu.toString());
-                        } else {
-                            Log.d("bluetoothcar", "<-- " + sbu);
-                            str = "<-- " + sbu.toString();
-                        }
-                        str += '\n';
-                    }
-                });
-            }
-
         } catch (IOException e) {
-            Log.e("bluetoothcar", ">>", e);
-            finish();
-            return;
-        } finally {
-            if (socket != null) {
-                try {
-                    Log.d("bluetoothcar", ">>Client Socket Close");
-                    socket.close();
-                    finish();
-                    return;
-                } catch (IOException e) {
-                    Log.e("bluetoothcar", ">>", e);
-                }
-            }
+            Log.d("bluetoothcar", "Error al conectar con el coche");
         }
     }
 }

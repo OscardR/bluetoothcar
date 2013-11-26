@@ -65,7 +65,7 @@ public class DeviceListAdapter extends BaseAdapter {
 
         static class ViewHolder {
             TextView deviceName;
-            TextView deviceInfo;
+            //TextView deviceInfo;
             TextView deviceMAC;
         }
 }

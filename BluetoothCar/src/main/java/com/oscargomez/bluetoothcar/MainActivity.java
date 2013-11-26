@@ -60,6 +60,7 @@ public class MainActivity extends ActionBarActivity {
                 toast.show();
 
                 Intent i = new Intent(getApplicationContext(), ControllerActivity.class);
+                i.putExtra(BluetoothDevice.EXTRA_DEVICE, (BluetoothDevice) listDevices.getItemAtPosition(position));
                 startActivity(i);
             }
         });
